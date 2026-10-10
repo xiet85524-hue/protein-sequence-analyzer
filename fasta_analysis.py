@@ -137,6 +137,7 @@ def extra_metrics(seq):
     n_cys = s.count("C")
     hydro = sum(s.count(a) for a in HYDROPHOBIC)
     out = {
+        "eps280": int(round(s.count("W") * 5500 + s.count("Y") * 1490 + (s.count("C") // 2) * 125)),
         "潜在二硫键对数": n_cys // 2,
         "疏水核心残基占比(%)": round(hydro / len(s) * 100, 1),
         # ↓↓↓ 取消注释，或自己加一行，就是你亲手加的指标 ↓↓↓
@@ -265,7 +266,7 @@ def batch():
     out_csv = os.path.join(os.path.dirname(os.path.abspath(__file__)), "w1d4_序列特征对比表.csv")
     fields = ["代号", "名称", "长度", "分子量kDa", "pI", "GRAVY", "芳香族",
               "不稳定指数", "净电荷@pH7", "带电荷残基", "Cys",
-              "潜在二硫键对数", "疏水核心残基占比(%)"]
+              "潜在二硫键对数", "疏水核心残基占比(%)", "eps280"]
     with open(out_csv, "w", newline="", encoding="utf-8-sig") as f:
         w = csv.writer(f)
         w.writerow(fields)
@@ -276,7 +277,7 @@ def batch():
                 round(r.get("gravy", 0), 3), round(r.get("aromaticity", 0), 3),
                 round(r.get("instability", 0), 1), round(r.get("net_charge7", 0), 2),
                 r.get("charged", 0), r.get("cys", 0),
-                r.get("潜在二硫键对数", "-"), r.get("疏水核心残基占比(%)", "-"),
+                r.get("潜在二硫键对数", "-"), r.get("疏水核心残基占比(%)", "-"), r.get("eps280", "-"),
             ])
     print("\n" + "=" * 70)
     print(f"[OK] 蛋白对比表已导出：{out_csv}（共 {len(rows)} 条蛋白，已自动剔除疑似核酸序列）")
