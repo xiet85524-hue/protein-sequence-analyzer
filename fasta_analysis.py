@@ -123,6 +123,14 @@ def _pI_fallback(s):
     return (lo + hi) / 2.0
 
 
+def count_nxs(seq):
+    n = 0
+    for i in range(len(seq) - 2):
+        if seq[i] == "N" and seq[i + 1] != "P" and seq[i + 2] in "ST":
+            n = n + 1
+    return n
+
+
 # ========== 可扩展指标区（★ W1 Day4：你亲手加指标的地方） ==========
 # analyze() 已经算好了长度/组成/MW/pI/GRAVY/芳香族/不稳定/净电荷/带电荷/Cys。
 # 下面示范加一个「对你表达/复性最有用」的新指标：
@@ -130,7 +138,8 @@ def _pI_fallback(s):
 #   · hydro_ratio：疏水核心残基占比（越高越易形成疏水斑/包涵体倾向）
 # 然后 extra_metrics() 是一个「留给你自己实现」的钩子——你可以加任意新指标，
 # 比如：带正电残基占比、脯氨酸（柔韧/转角）占比、N/Q 脱酰胺风险位点计数……
-# 只要 return 一个 dict，batch() 会自动把它拼进对比表最后一列。
+# 注意：光 return 一个 dict 还不够。batch() 里的 fields（列名）和 writerow（取值）
+# 是另外写死的一份清单，加一个指标要三处一起改，否则「字典里有、表里没有」。
 def extra_metrics(seq):
     """★ 占位：你亲手加的新指标。返回 dict（键=指标名，值=数字或字符串）。"""
     s = seq.upper()
@@ -140,6 +149,7 @@ def extra_metrics(seq):
         "eps280": int(round(s.count("W") * 5500 + s.count("Y") * 1490 + (s.count("C") // 2) * 125)),
         "潜在二硫键对数": n_cys // 2,
         "疏水核心残基占比(%)": round(hydro / len(s) * 100, 1),
+        "nxs_位点数": count_nxs(s),
         # ↓↓↓ 取消注释，或自己加一行，就是你亲手加的指标 ↓↓↓
         # "脯氨酸占比(%)": round(s.count("P") / len(s) * 100, 1),
     }
@@ -266,7 +276,7 @@ def batch():
     out_csv = os.path.join(os.path.dirname(os.path.abspath(__file__)), "w1d4_序列特征对比表.csv")
     fields = ["代号", "名称", "长度", "分子量kDa", "pI", "GRAVY", "芳香族",
               "不稳定指数", "净电荷@pH7", "带电荷残基", "Cys",
-              "潜在二硫键对数", "疏水核心残基占比(%)", "eps280"]
+              "潜在二硫键对数", "疏水核心残基占比(%)", "eps280", "nxs_位点数"]
     with open(out_csv, "w", newline="", encoding="utf-8-sig") as f:
         w = csv.writer(f)
         w.writerow(fields)
@@ -277,7 +287,7 @@ def batch():
                 round(r.get("gravy", 0), 3), round(r.get("aromaticity", 0), 3),
                 round(r.get("instability", 0), 1), round(r.get("net_charge7", 0), 2),
                 r.get("charged", 0), r.get("cys", 0),
-                r.get("潜在二硫键对数", "-"), r.get("疏水核心残基占比(%)", "-"), r.get("eps280", "-"),
+                r.get("潜在二硫键对数", "-"), r.get("疏水核心残基占比(%)", "-"), r.get("eps280", "-"), r.get("nxs_位点数", "-"),
             ])
     print("\n" + "=" * 70)
     print(f"[OK] 蛋白对比表已导出：{out_csv}（共 {len(rows)} 条蛋白，已自动剔除疑似核酸序列）")
@@ -318,13 +328,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-def count_nxs(seq):
-    n = 0
-    for i in range(len(seq) - 2):
-        if seq[i] == "N" and seq[i + 1] != "P" and seq[i + 2] in "ST":
-            n = n + 1
-    return n
