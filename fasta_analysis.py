@@ -323,6 +323,9 @@ def main():
             print(f"[ERROR] 找不到文件或未知蛋白代号：{arg}")
             print("可用代号：", ", ".join(list(KNOWN.keys()) + ["all"]))
             return
+    if not seq.strip():
+        print(f"[ERROR] 文件里没有序列（空文件或无序列行）：{name}")
+        return
     report(seq, name=name)
 
 
