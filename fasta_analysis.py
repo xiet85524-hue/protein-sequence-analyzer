@@ -289,10 +289,26 @@ def batch():
                 r.get("charged", 0), r.get("cys", 0),
                 r.get("潜在二硫键对数", "-"), r.get("疏水核心残基占比(%)", "-"), r.get("eps280", "-"), r.get("nxs_位点数", "-"),
             ])
+    out_txt = os.path.join(os.path.dirname(os.path.abspath(__file__)), "分析报告.txt")
+    write_txt_report(rows, out_txt)
+    print(f"[OK] 文字报告已导出：{out_txt}")
     print("\n" + "=" * 70)
     print(f"[OK] 蛋白对比表已导出：{out_csv}（共 {len(rows)} 条蛋白，已自动剔除疑似核酸序列）")
     print("（这就是今天沉淀的科研资产：一份可直接进 Excel/案例库的数据表）")
     return rows
+
+
+# ---------- 5.5 文字报告：给人看的一份（★ W1 Day5 新增） ----------
+def write_txt_report(rows, path):
+    """把对比结果写成一份「人直接能读」的 txt（CSV 给表格，txt 给汇报/记录）。"""
+    lines = ["蛋白序列特征报告", "=" * 44]
+    for code, name, r in rows:
+        lines.append(f"{code} | 长度 {r['length']} aa | MW {r.get('mw',0)/1000:.2f} kDa | "
+                     f"pI {r.get('pI',0):.2f} | eps280 {r.get('eps280','-')} | NXS {r.get('nxs_位点数','-')}")
+    lines.append("=" * 44)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    return path
 
 
 # ---------- 6. 主程序 ----------
