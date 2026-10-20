@@ -299,6 +299,7 @@ def batch():
     print("\n" + "=" * 70)
     print(f"[OK] 蛋白对比表已导出：{out_csv}（共 {len(rows)} 条蛋白，已自动剔除疑似核酸序列）")
     print("（这就是今天沉淀的科研资产：一份可直接进 Excel/案例库的数据表）")
+    show_run_log(out_log)
     return rows
 
 
@@ -331,6 +332,12 @@ def append_run_log(path, rows, report_path):
 
 
 # ---------- 6. 主程序 ----------
+def show_run_log(path):
+    with open(path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    print(f"[OK] 运行记录 {len(lines)} 行")
+    print(f"[OK] 最后一行：{lines[-1].strip()}")
+
 def main():
     arg = sys.argv[1] if len(sys.argv) > 1 else "kgf2"
     # 别名兼容（kgf2/opn/kegf）
