@@ -337,6 +337,7 @@ def show_run_log(path):
         lines = f.readlines()
     print(f"[OK] 运行记录 {len(lines)} 行")
     print(f"[OK] 最后一行：{lines[-1].strip()}")
+    return len(lines)
 
 def main():
     arg = sys.argv[1] if len(sys.argv) > 1 else "kgf2"
