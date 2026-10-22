@@ -294,12 +294,12 @@ def batch():
     write_txt_report(rows, out_txt)
     print(f"[OK] 文字报告已导出：{out_txt}")
     out_log = os.path.join(os.path.dirname(os.path.abspath(__file__)), "运行记录.txt")
-    append_run_log(out_log, rows, out_txt)
+    k = show_run_log(out_log)
+    append_run_log(out_log, rows, out_txt, k + 1)
     print(f"[OK] 运行记录已追加：{out_log}")
     print("\n" + "=" * 70)
     print(f"[OK] 蛋白对比表已导出：{out_csv}（共 {len(rows)} 条蛋白，已自动剔除疑似核酸序列）")
     print("（这就是今天沉淀的科研资产：一份可直接进 Excel/案例库的数据表）")
-    show_run_log(out_log)
     return rows
 
 
@@ -317,7 +317,7 @@ def write_txt_report(rows, path):
 
 
 # ---------- 5.6 运行记录：每次跑完往同一个文件「接着写」一行（★ W1 Day6 新增） ----------
-def append_run_log(path, rows, report_path):
+def append_run_log(path, rows, report_path, seq_no):
     """用 "a" 模式往同一个文件追加一行：时间 | 命令 | 蛋白条数 | 报告行数。
     注意与上面那句的区别：那里是 "w"（倒掉重写），这里是 "a"（接着写）。"""
     n = 0
@@ -327,7 +327,7 @@ def append_run_log(path, rows, report_path):
     cmd = " ".join(sys.argv[1:]) or "(default)"
     stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     with open(path, "a", encoding="utf-8") as f:
-        f.write(f"{stamp} | 命令 {cmd} | 蛋白 {len(rows)} 条 | 报告 {n} 行\n")
+        f.write(f"{stamp} | 命令 {cmd} | 蛋白 {len(rows)} 条 | 报告 {n} 行 | 累计第 {seq_no} 次\n")
     return n
 
 
