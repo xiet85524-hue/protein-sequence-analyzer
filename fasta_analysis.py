@@ -337,6 +337,9 @@ def show_run_log(path):
         lines = f.readlines()
     print(f"[OK] 运行记录 {len(lines)} 行")
     print(f"[OK] 最后一行：{lines[-1].strip()}")
+    print("[OK] 最近 3 次运行：")
+    for one in lines[-3:]:
+        print(one.rstrip())
     return len(lines)
 
 def main():
