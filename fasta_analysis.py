@@ -311,6 +311,14 @@ def write_txt_report(rows, path):
         lines.append(f"{code} | 长度 {r['length']} aa | MW {r.get('mw',0)/1000:.2f} kDa | "
                      f"pI {r.get('pI',0):.2f} | eps280 {r.get('eps280','-')} | NXS {r.get('nxs_位点数','-')}")
     lines.append("=" * 44)
+    _log = os.path.join(os.path.dirname(os.path.abspath(path)), "运行记录.txt")
+    if os.path.exists(_log):
+        with open(_log, "r", encoding="utf-8") as _f:
+            _old = _f.read().splitlines()
+        lines.append("")
+        lines.append("最近 3 次运行：")
+        for _one in _old[-3:]:
+            lines.append(_one)
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
     return path
